@@ -5,15 +5,15 @@ const API_URL = `${BASE_URL}/api/v1`;
 
 // Available models configuration
 const DEFAULT_MODELS = [
+    { id: 'venice-uncensored', name: 'Venice Uncensored 1.1', isAvailable: false },
+    { id: 'zai-org-glm-4.6', name: 'GLM 4.6', isAvailable: false },
+    { id: 'qwen3-4b', name: 'Venice Small (Qwen 3 4B)', isAvailable: false },
+    { id: 'mistral-31-24b', name: 'Venice Medium (Mistral 3.1 24B)', isAvailable: false },
     { id: 'llama-3.3-70b', name: 'Llama 3.3 70B', isAvailable: false },
-    { id: 'llama-3.2-3b', name: 'Llama 3.2 3B', isAvailable: false },
-    { id: 'mistral-31-24b', name: 'Mistral 3.1 24B', isAvailable: false },
-    { id: 'dolphin-2.9.2-qwen2-72b', name: 'Dolphin 2.9.2 Qwen2 72B', isAvailable: false },
-    { id: 'llama-3.1-405b', name: 'Llama 3.1 405B', isAvailable: false },
-    { id: 'qwen-2.5-coder-32b', name: 'Qwen 2.5 Coder 32B', isAvailable: false },
     { id: 'deepseek-r1-671b', name: 'DeepSeek R1 671B', isAvailable: false },
     { id: 'qwen-2.5-vl', name: 'Qwen 2.5 VL 72B', isAvailable: false },
-    { id: 'qwen-2.5-qwq-32b', name: 'Qwen 2.5 QwQ 32B', isAvailable: false }
+    { id: 'llama-3.1-405b', name: 'Llama 3.1 405B', isAvailable: false },
+    { id: 'qwen-2.5-coder-32b', name: 'Qwen 2.5 Coder 32B', isAvailable: false }
 ];
 
 // Global variables to store extracted data
@@ -38,18 +38,18 @@ document.addEventListener('DOMContentLoaded', () => {
     const dropZone = document.getElementById('dropZone');
     const fileInput = document.getElementById('pdfFile');
     const selectedFileName = document.getElementById('selectedFileName');
-    
+
     // Set the API key in the input field
     if (apiKeyInput) {
         apiKeyInput.value = VENICE_API_KEY;
     }
-    
+
     console.log('Initializing with API key:', VENICE_API_KEY);
-    
+
     // Fetch models immediately since we have the key
     fetchAvailableModels().then(models => {
         console.log(`Loaded ${models.length} models from API`);
-        
+
         // Populate model select dropdown if it exists
         if (modelSelect) {
             modelSelect.innerHTML = '';
@@ -59,7 +59,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 option.textContent = model.name || model.id;
                 modelSelect.appendChild(option);
             });
-            
+
             // Add a default option if no models were found
             if (models.length === 0) {
                 const option = document.createElement('option');
@@ -70,7 +70,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }).catch(error => {
         console.error('Error loading models:', error);
-        
+
         // Add default option if there was an error
         if (modelSelect) {
             modelSelect.innerHTML = '<option value="mixtral-8x7b">Mixtral 8x7B (Default)</option>';
@@ -79,7 +79,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Enable the form since we have a valid key
     const submitButton = uploadForm?.querySelector('button[type="submit"]');
-    
+
     if (submitButton) submitButton.disabled = false;
     if (modelSelect) modelSelect.disabled = false;
 
@@ -90,12 +90,12 @@ document.addEventListener('DOMContentLoaded', () => {
             document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
             // Add active class to clicked item
             item.classList.add('active');
-            
+
             // Hide all sections
             document.querySelectorAll('.content-section').forEach(section => {
                 section.style.display = 'none';
             });
-            
+
             // Show selected section
             const sectionId = item.getAttribute('data-section');
             const targetSection = document.getElementById(sectionId);
@@ -104,12 +104,12 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     });
-    
+
     // Set up event listeners
     if (uploadForm) {
         uploadForm.addEventListener('submit', handleFileUpload);
     }
-    
+
     if (validateApiKeyBtn) {
         validateApiKeyBtn.addEventListener('click', async () => {
             const result = await handleApiKeyValidation();
@@ -122,11 +122,11 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
-    
+
     if (toggleApiKeyBtn) {
         toggleApiKeyBtn.addEventListener('click', toggleApiKeyVisibility);
     }
-    
+
     // Add speaker search functionality
     const speakerSearchInput = document.getElementById('speakerSearchInput');
     if (speakerSearchInput) {
@@ -134,7 +134,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const searchTerm = e.target.value.toLowerCase();
             const speakersList = document.getElementById('speakersList');
             const speakers = speakersList.getElementsByTagName('li');
-            
+
             Array.from(speakers).forEach(speaker => {
                 if (speaker.textContent.toLowerCase().includes(searchTerm)) {
                     speaker.style.display = '';
@@ -167,7 +167,7 @@ document.addEventListener('DOMContentLoaded', () => {
 function toggleApiKeyVisibility() {
     const apiKeyInput = document.getElementById('apiKeyInput');
     const toggleBtn = document.getElementById('toggleApiKey');
-    
+
     if (apiKeyInput.type === 'password') {
         apiKeyInput.type = 'text';
         toggleBtn.innerHTML = `
@@ -192,65 +192,65 @@ async function handleApiKeyValidation() {
     // Get the API key from the input field
     const apiKeyInput = document.getElementById('apiKeyInput');
     const VENICE_API_KEY = apiKeyInput.value.trim();
-    
+
     // Show status
     const apiKeyStatus = document.getElementById('apiKeyStatus');
     apiKeyStatus.classList.remove('d-none', 'alert-success', 'alert-danger');
     apiKeyStatus.classList.add('alert-info');
     apiKeyStatus.textContent = 'Validating API key...';
-    
+
     // Disable the validate button while validating
     const validateBtn = document.getElementById('validateApiKey');
     validateBtn.disabled = true;
-    
+
     try {
         // Validate the API key
         const isValid = await validateApiKey();
-        
+
         if (isValid) {
             // Save API key to localStorage
             localStorage.setItem('venice_api_key', VENICE_API_KEY);
-            
+
             // If API key is valid, update status and fetch models
             apiKeyStatus.classList.remove('alert-info', 'alert-danger');
             apiKeyStatus.classList.add('alert-success');
             apiKeyStatus.textContent = 'API key is valid! Loading models...';
-            
+
             // Enable the form
             document.querySelector('#uploadForm button[type="submit"]').disabled = false;
             document.getElementById('modelSelect').disabled = false;
-            
+
             // Fetch available models
             await fetchAvailableModels();
-            
+
             apiKeyStatus.textContent = 'API key is valid! Models loaded successfully.';
-            
+
             // Close the modal
             const modal = bootstrap.Modal.getInstance(document.getElementById('settingsModal'));
             if (modal) {
                 modal.hide();
             }
-            
+
             return true;
         } else {
             // If API key is invalid, update status
             apiKeyStatus.classList.remove('alert-info', 'alert-success');
             apiKeyStatus.classList.add('alert-danger');
             apiKeyStatus.textContent = 'Invalid API key. Please check your API key and try again.';
-            
+
             // Disable the form
             document.querySelector('#uploadForm button[type="submit"]').disabled = true;
-            
+
             // Update model select
             const modelSelect = document.getElementById('modelSelect');
             modelSelect.innerHTML = '<option value="error" selected>Error: Invalid API Key</option>';
             modelSelect.disabled = true;
-            
+
             return false;
         }
     } catch (error) {
         console.error('Error validating API key:', error);
-        
+
         // Update status
         apiKeyStatus.classList.remove('alert-info', 'alert-success');
         apiKeyStatus.classList.add('alert-danger');
@@ -296,10 +296,10 @@ async function fetchAvailableModels() {
 
         const data = await response.json();
         console.log('Models API response:', data);
-        
+
         // Extract models from the response
         let models = [];
-        
+
         if (data.data && Array.isArray(data.data)) {
             // Format from the swagger spec
             models = data.data.map(model => ({
@@ -311,12 +311,12 @@ async function fetchAvailableModels() {
             // Alternative format
             models = data.models;
         }
-        
+
         // Filter for text models only
-        const textModels = models.filter(model => 
+        const textModels = models.filter(model =>
             model.type === 'text' || !model.type
         );
-        
+
         console.log(`Found ${textModels.length} text models`);
         return textModels;
     } catch (error) {
@@ -327,41 +327,17 @@ async function fetchAvailableModels() {
 
 async function handleFileUpload(event) {
     event.preventDefault();
-    
-    const fileInput = document.getElementById('pdfFile');
+
+    // Determine active tab
+    const activeTab = document.querySelector('.nav-link.active[data-bs-toggle="tab"]');
+    const activeTabId = activeTab ? activeTab.id : 'pdf-tab';
+
     const uploadStatus = document.querySelector('.upload-status');
     const progressContainer = document.getElementById('uploadProgress');
-    
-    if (!fileInput || !uploadStatus) {
-        console.error('Required elements not found');
-        return;
-    }
-    
-    const file = fileInput.files[0];
-    
-    if (!file || file.type !== 'application/pdf') {
-        uploadStatus.innerHTML = `
-            <div class="alert alert-danger">
-                <i class="bi bi-exclamation-triangle me-2"></i>
-                Please select a valid PDF file
-            </div>
-        `;
-        return;
-    }
-
-    // Show upload status
-    uploadStatus.innerHTML = `
-        <div class="alert alert-info">
-            <i class="bi bi-arrow-repeat spin me-2"></i>
-            Processing: ${file.name}
-        </div>
-    `;
-    
-    // Get the selected model
     const modelSelect = document.getElementById('modelSelect');
     const selectedModel = modelSelect?.value || 'mixtral-8x7b';
-    
-    // Initialize and show progress container
+
+    // Initialize progress tracking
     if (progressContainer) {
         progressContainer.innerHTML = `
             <div class="progress-container">
@@ -375,64 +351,88 @@ async function handleFileUpload(event) {
                     <div class="progress-status">Starting...</div>
                 </div>
                 <div class="current-file mt-3">
-                    <i class="bi bi-file-pdf me-2"></i>
-                    ${file.name}
+                    <i class="bi bi-gear-wide-connected me-2"></i>
+                    Processing Request
                 </div>
             </div>
         `;
         progressContainer.style.display = 'block';
         progressContainer.classList.remove('d-none');
     }
-    
-    // Get the circle element and calculate its properties
-    const circle = progressContainer.querySelector('.progress-ring__circle');
-    const radius = circle.r.baseVal.value;
+
+    const circle = progressContainer?.querySelector('.progress-ring__circle');
+    const radius = circle ? circle.r.baseVal.value : 52;
     const circumference = radius * 2 * Math.PI;
-    circle.style.strokeDasharray = `${circumference} ${circumference}`;
-    circle.style.strokeDashoffset = circumference;
-    
-    // Function to update progress
+
+    if (circle) {
+        circle.style.strokeDasharray = `${circumference} ${circumference}`;
+        circle.style.strokeDashoffset = circumference;
+    }
+
     function setProgress(percent, status) {
+        if (!progressContainer) return;
         const offset = circumference - (percent / 100 * circumference);
-        circle.style.strokeDashoffset = offset;
+        if (circle) circle.style.strokeDashoffset = offset;
         progressContainer.querySelector('.progress-text').textContent = `${Math.round(percent)}%`;
         progressContainer.querySelector('.progress-status').textContent = status;
     }
-    
+
     try {
-        // Extract text from PDF using PDF.js first
-        setProgress(25, 'Extracting text...');
-        const pdfText = await extractTextFromPDF(file);
-        
-        if (!pdfText || pdfText.trim().length === 0) {
-            throw new Error('No text could be extracted from the PDF. The file might be image-based or protected.');
+        let extractedText = '';
+        let analysisResults = null;
+        let summary = '';
+
+        if (activeTabId === 'website-tab') {
+            const urlInput = document.getElementById('websiteUrl');
+            const url = urlInput.value.trim();
+            if (!url) throw new Error('Please enter a valid URL');
+
+            setProgress(30, 'Analyzing website...');
+            // For website, we ask Venice to research the URL
+            analysisResults = await analyzeWebsiteContent(url, selectedModel);
+            extractedText = `Website Analysis of ${url}`; // Placeholder
+
+        } else if (activeTabId === 'screenshot-tab') {
+            const fileInput = document.getElementById('screenshotFile');
+            const file = fileInput.files[0];
+            if (!file) throw new Error('Please select an image file');
+
+            setProgress(30, 'Analyzing screenshot...');
+            const base64Image = await fileToBase64(file);
+            analysisResults = await analyzeScreenshotContent(base64Image, selectedModel);
+            extractedText = "Screenshot Analysis"; // Placeholder
+
+        } else {
+            // PDF Handling
+            const fileInput = document.getElementById('pdfFile');
+            const file = fileInput.files[0];
+            if (!file) throw new Error('Please select a PDF file');
+
+            setProgress(25, 'Extracting text...');
+            extractedText = await extractTextFromPDF(file);
+
+            if (!extractedText || extractedText.trim().length === 0) {
+                throw new Error('No text extracted from PDF. It might be image-based.');
+            }
+
+            setProgress(50, 'Analyzing content...');
+            analysisResults = await analyzePDFContent(extractedText, selectedModel);
         }
-        
-        // Update progress for text extraction complete
-        setProgress(50, 'Analyzing content...');
-        
-        // Check if the extracted text is too short
-        if (pdfText.trim().length < 50) {
-            const warningDiv = document.createElement('div');
-            warningDiv.className = 'alert alert-warning mt-3';
-            warningDiv.innerHTML = `
-                <strong>Warning:</strong> Very little text was extracted (${pdfText.trim().length} characters). 
-                The PDF might be image-based. Try converting it to text first.
-            `;
-            document.querySelector('#uploadForm').appendChild(warningDiv);
-        }
-        
-        // Continue with analysis using Venice API
-        const analysisResults = await analyzePDFContent(pdfText, selectedModel);
+
+        // Store global text for other functions
+        pdfText = extractedText;
+
         setProgress(75, 'Generating summary...');
-        
-        // Generate summary
-        const summary = await generateAgendaSummary(pdfText, selectedModel);
+        if (!summary && activeTabId === 'pdf-tab') {
+             summary = await generateAgendaSummary(extractedText, selectedModel);
+        } else {
+             // For website/screenshot, the analysis might already include summary or we generate one from results
+             summary = await generateSummaryFromResults(analysisResults, selectedModel);
+        }
+
         setProgress(100, 'Complete!');
-        
-        // Process and display results
         processResults(analysisResults, summary);
-        
+
         // Switch to summary section
         document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
         document.querySelector('[data-section="summary-section"]').classList.add('active');
@@ -440,59 +440,239 @@ async function handleFileUpload(event) {
             section.style.display = 'none';
         });
         document.getElementById('summary-section').style.display = 'block';
-        
-        // Hide progress after a short delay
+
         setTimeout(() => {
-            progressContainer.classList.add('d-none');
+            if (progressContainer) progressContainer.classList.add('d-none');
         }, 1000);
-        
+
     } catch (error) {
-        console.error('Error processing PDF:', error);
+        console.error('Error:', error);
         const errorDiv = document.createElement('div');
         errorDiv.className = 'alert alert-danger mt-3';
-        errorDiv.innerHTML = `
-            <strong>Error:</strong> ${error.message}
-            <br><br>
-            Please try again or contact support if the problem persists.
-        `;
+        errorDiv.innerHTML = `<strong>Error:</strong> ${error.message}`;
         document.querySelector('#uploadForm').appendChild(errorDiv);
-        
-        // Update progress to show error
-        setProgress(100, 'Error!');
-        circle.style.stroke = 'var(--danger-color)';
-        
-        // Hide progress after a delay
-        setTimeout(() => {
-            progressContainer.classList.add('d-none');
-        }, 2000);
+
+        if (progressContainer) {
+            setProgress(100, 'Error!');
+            if (circle) circle.style.stroke = 'var(--danger-color)';
+            setTimeout(() => progressContainer.classList.add('d-none'), 2000);
+        }
     }
+}
+
+async function fileToBase64(file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = error => reject(error);
+    });
+}
+
+async function analyzeWebsiteContent(url, model) {
+    // Construct a prompt to extract agenda info from the URL using Venice's web search/scraping capability
+    const prompt = `Analyze the conference agenda found at this URL: ${url}.
+    Extract the following information and format it exactly as shown:
+
+### Key Highlights
+- [Brief, impactful statements about the most important aspects]
+
+### Topics
+- Topic: [topic name]
+- Weight: [number 1-10]
+- Description: [brief description]
+- Related: [comma-separated list of related topics]
+
+### Therapeutic Areas
+- Name: [therapeutic area name]
+- Description: [description]
+- Key Sessions: [relevant sessions]
+- Featured Speakers: [key speakers]
+
+### Key Themes
+- Theme: [theme name]
+- Description: [description]
+- Related Sessions: [relevant session names]
+
+### Speakers
+- Name: [name]
+- Role: [role]
+- Affiliation: [organization]
+- Topics: [topics]
+`;
+
+    const response = await fetch(`${API_URL}/chat/completions`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${VENICE_API_KEY}`
+        },
+        body: JSON.stringify({
+            model: model,
+            messages: [{ role: "user", content: prompt }],
+            venice_parameters: {
+                enable_web_search: "auto",
+                enable_web_scraping: true
+            }
+        })
+    });
+
+    if (!response.ok) throw new Error('Website analysis failed');
+    const data = await response.json();
+    return parseAnalysisResponse(data.choices[0].message.content);
+}
+
+async function analyzeScreenshotContent(base64Image, model) {
+    // Ensure we use a vision capable model
+    const visionModel = 'qwen-2.5-vl'; // Force vision model or check capabilities
+
+    const response = await fetch(`${API_URL}/chat/completions`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${VENICE_API_KEY}`
+        },
+        body: JSON.stringify({
+            model: visionModel,
+            messages: [
+                {
+                    role: "user",
+                    content: [
+                        { type: "text", text: "Analyze this conference agenda image. Extract Key Highlights, Topics (with weight 1-10), Therapeutic Areas, Key Themes, and Speakers. Format with Markdown headers like ### Topics, ### Speakers, etc." },
+                        { type: "image_url", image_url: { url: base64Image } }
+                    ]
+                }
+            ]
+        })
+    });
+
+    if (!response.ok) throw new Error('Screenshot analysis failed');
+    const data = await response.json();
+    return parseAnalysisResponse(data.choices[0].message.content);
+}
+
+function parseAnalysisResponse(content) {
+    // Reuse the parsing logic from analyzePDFContent but separate it out
+    const sections = content.split('###').filter(Boolean);
+    const result = {
+        highlights: [],
+        topics: [],
+        speakers: [],
+        therapeuticAreas: [],
+        themes: []
+    };
+
+    sections.forEach(section => {
+        const [title, ...lines] = section.trim().split('\n');
+        const cleanLines = lines.filter(line => line.trim() && line.trim().startsWith('-'));
+
+        switch (title.trim()) {
+            case 'Key Highlights':
+                result.highlights = cleanLines.map(line => line.replace('- ', '').trim());
+                break;
+            case 'Topics':
+                let currentTopic = {};
+                cleanLines.forEach(line => {
+                    const [key, value] = line.replace('- ', '').split(': ');
+                    if (key === 'Topic') {
+                        if (Object.keys(currentTopic).length > 0) result.topics.push({...currentTopic});
+                        currentTopic = {};
+                    }
+                    if (key) currentTopic[key.toLowerCase()] = value;
+                });
+                if (Object.keys(currentTopic).length > 0) result.topics.push(currentTopic);
+                break;
+            case 'Speakers': // Handle Speakers explicitly if present in main analysis
+                 let currentSpeaker = {};
+                 cleanLines.forEach(line => {
+                    const [key, value] = line.replace('- ', '').split(': ');
+                    if (key === 'Name') {
+                        if (Object.keys(currentSpeaker).length > 0) result.speakers.push({...currentSpeaker});
+                        currentSpeaker = {};
+                    }
+                    if (key) currentSpeaker[key.toLowerCase()] = value;
+                 });
+                 if (Object.keys(currentSpeaker).length > 0) result.speakers.push(currentSpeaker);
+                 break;
+            // ... (Add other cases or reuse existing logic if refactored)
+            case 'Therapeutic Areas':
+                let currentArea = {};
+                cleanLines.forEach(line => {
+                    const [key, value] = line.replace('- ', '').split(': ');
+                    if (key === 'Name') {
+                        if (Object.keys(currentArea).length > 0) result.therapeuticAreas.push({...currentArea});
+                        currentArea = {};
+                    }
+                    if (key === 'Featured Speakers' || key === 'Key Sessions') {
+                        currentArea[key.toLowerCase()] = value.split(',').map(item => item.trim());
+                    } else {
+                        currentArea[key.toLowerCase()] = value;
+                    }
+                });
+                if (Object.keys(currentArea).length > 0) result.therapeuticAreas.push(currentArea);
+                break;
+            case 'Key Themes':
+                cleanLines.forEach(line => {
+                    const [key, value] = line.replace('- ', '').split(': ');
+                    if (key === 'Theme') {
+                        result.themes.push({ name: value, description: '', relatedSessions: [] });
+                    } else if (key === 'Description' && result.themes.length > 0) {
+                        result.themes[result.themes.length - 1].description = value;
+                    } else if (key === 'Related Sessions' && result.themes.length > 0) {
+                        result.themes[result.themes.length - 1].relatedSessions = value.split(',').map(s => s.trim());
+                    }
+                });
+                break;
+        }
+    });
+    return result;
+}
+
+async function generateSummaryFromResults(results, model) {
+    // Generate a summary text from the structured results if raw text isn't available
+    const summaryPrompt = `Generate a conference summary based on these highlights: ${JSON.stringify(results.highlights)} and themes: ${JSON.stringify(results.themes)}`;
+
+    const response = await fetch(`${API_URL}/chat/completions`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${VENICE_API_KEY}`
+        },
+        body: JSON.stringify({
+            model: model,
+            messages: [{ role: "user", content: summaryPrompt }]
+        })
+    });
+
+    const data = await response.json();
+    return data.choices[0].message.content;
 }
 
 async function extractTextFromPDF(file) {
     return new Promise((resolve, reject) => {
         const reader = new FileReader();
-        
+
         reader.onload = async function(event) {
             const typedArray = new Uint8Array(event.target.result);
-            
+
             try {
                 // Using PDF.js to extract text
                 const pdf = await pdfjsLib.getDocument({data: typedArray}).promise;
                 let text = '';
-                
+
                 for (let i = 1; i <= pdf.numPages; i++) {
                     const page = await pdf.getPage(i);
                     const content = await page.getTextContent();
                     const strings = content.items.map(item => item.str);
                     text += strings.join(' ') + '\n';
                 }
-                
+
                 resolve(text);
             } catch (error) {
                 reject(error);
             }
         };
-        
+
         reader.onerror = reject;
         reader.readAsArrayBuffer(file);
     });
@@ -501,10 +681,10 @@ async function extractTextFromPDF(file) {
 async function generateAgendaSummary(text, model) {
     // Truncate text if it's too long (Venice API has limits)
     const maxTextLength = 15000; // Reasonable limit for API request
-    const truncatedText = text.length > maxTextLength 
-        ? text.substring(0, maxTextLength) + "... [text truncated due to length]" 
+    const truncatedText = text.length > maxTextLength
+        ? text.substring(0, maxTextLength) + "... [text truncated due to length]"
         : text;
-    
+
     // Prepare the request to Venice.ai API for summarization
     const messages = [
         {
@@ -516,17 +696,17 @@ async function generateAgendaSummary(text, model) {
             content: `Please summarize this conference agenda: ${truncatedText}`
         }
     ];
-    
+
     const requestBody = {
         model: model,
         messages: messages,
         temperature: 0.3,
         max_tokens: 1000 // Using max_tokens instead of max_completion_tokens for better compatibility
     };
-    
+
     try {
         console.log("Making summary API request to Venice.ai...");
-        
+
         const response = await fetch(`${API_URL}/chat/completions`, {
             method: 'POST',
             headers: {
@@ -535,17 +715,17 @@ async function generateAgendaSummary(text, model) {
             },
             body: JSON.stringify(requestBody)
         });
-        
+
         if (!response.ok) {
             const errorData = await response.json().catch(() => ({}));
             console.error("Summary API Error Response:", errorData);
             throw new Error(`API request failed with status ${response.status}: ${errorData.error || 'Unknown error'}`);
         }
-        
+
         const data = await response.json();
         console.log("Summary API Response received successfully");
         return data.choices[0].message.content;
-        
+
     } catch (error) {
         console.error('Error generating summary:', error);
         return "Unable to generate summary. Please try again.";
@@ -554,10 +734,10 @@ async function generateAgendaSummary(text, model) {
 
 async function analyzePDFContent(text, model) {
     console.log('Making API request to Venice.ai...');
-    
+
     // First, use a specialized model for speaker extraction
     const speakerResults = await extractSpeakersAndPanelists(text);
-    
+
     try {
         const response = await fetch(`${API_URL}/chat/completions`, {
             method: 'POST',
@@ -611,7 +791,7 @@ async function analyzePDFContent(text, model) {
 
         const data = await response.json();
         const content = data.choices[0].message.content;
-        
+
         // Parse the markdown response into structured data
         const sections = content.split('###').filter(Boolean);
         const result = {
@@ -621,14 +801,14 @@ async function analyzePDFContent(text, model) {
             therapeuticAreas: [],
             themes: []
         };
-        
+
         sections.forEach(section => {
             const [title, ...lines] = section.trim().split('\n');
             const cleanLines = lines.filter(line => line.trim() && line.trim().startsWith('-'));
-            
+
             switch (title.trim()) {
                 case 'Key Highlights':
-                    result.highlights = cleanLines.map(line => 
+                    result.highlights = cleanLines.map(line =>
                         line.replace('- ', '').trim()
                     );
                     break;
@@ -655,7 +835,7 @@ async function analyzePDFContent(text, model) {
                         result.topics.push(currentTopic);
                     }
                     break;
-                    
+
                 case 'Therapeutic Areas':
                     let currentArea = {};
                     cleanLines.forEach(line => {
@@ -676,7 +856,7 @@ async function analyzePDFContent(text, model) {
                         result.therapeuticAreas.push(currentArea);
                     }
                     break;
-                    
+
                 case 'Key Themes':
                     cleanLines.forEach(line => {
                         const [key, value] = line.replace('- ', '').split(': ');
@@ -689,16 +869,16 @@ async function analyzePDFContent(text, model) {
                         } else if (key === 'Description' && result.themes.length > 0) {
                             result.themes[result.themes.length - 1].description = value;
                         } else if (key === 'Related Sessions' && result.themes.length > 0) {
-                            result.themes[result.themes.length - 1].relatedSessions = 
+                            result.themes[result.themes.length - 1].relatedSessions =
                                 value.split(',').map(s => s.trim());
                         }
                     });
                     break;
             }
         });
-        
+
         return result;
-        
+
     } catch (error) {
         console.log('Error calling Venice.ai API:', error);
         throw error;
@@ -749,15 +929,15 @@ For each speaker, use "Not specified" if information is unavailable.`
 
         const data = await response.json();
         const content = data.choices[0].message.content;
-        
+
         // Parse the speaker entries
         const speakerEntries = content.split('### Speaker Entry').filter(Boolean);
         const speakers = [];
-        
+
         speakerEntries.forEach(entry => {
             const lines = entry.trim().split('\n');
             let speaker = {};
-            
+
             lines.forEach(line => {
                 if (line.startsWith('- ')) {
                     const [key, ...valueParts] = line.substring(2).split(': ');
@@ -765,7 +945,7 @@ For each speaker, use "Not specified" if information is unavailable.`
                     speaker[key.toLowerCase()] = value;
                 }
             });
-            
+
             if (Object.keys(speaker).length > 0) {
                 if (speaker.topics) {
                     speaker.topics = speaker.topics.split(',').map(t => t.trim());
@@ -773,9 +953,9 @@ For each speaker, use "Not specified" if information is unavailable.`
                 speakers.push(speaker);
             }
         });
-        
+
         return { speakers };
-        
+
     } catch (error) {
         console.error('Error extracting speakers:', error);
         return { speakers: [] };
@@ -788,9 +968,9 @@ function processResults(results, summary) {
         .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
         .replace(/\n\n/g, '</div><div class="summary-section">')
         .replace(/\n/g, '<br>')
-        .replace(/(Conference Overview|Main Themes|Schedule Highlights|Key Topics):/g, 
+        .replace(/(Conference Overview|Main Themes|Schedule Highlights|Key Topics):/g,
             '<span class="summary-highlight">$1:</span>');
-    
+
     // Update the summary section with key highlights
     document.getElementById('agendaSummary').innerHTML = `
         <div class="agenda-summary">
@@ -798,7 +978,7 @@ function processResults(results, summary) {
                 <div class="summary-section">
                     <h3>Key Highlights</h3>
                     <ul class="highlights-list">
-                        ${results.highlights.map(highlight => 
+                        ${results.highlights.map(highlight =>
                             `<li>${highlight}</li>`
                         ).join('')}
                     </ul>
@@ -809,12 +989,12 @@ function processResults(results, summary) {
             </div>
         </div>
     `;
-    
+
     // Store the extracted data
     extractedTopics = results.topics || [];
     extractedSpeakers = results.speakers || [];
     therapeuticAreas = results.therapeuticAreas || [];
-    
+
     // Update other sections
     updateConferenceStats(results);
     updateTopicsSection(results);
@@ -845,7 +1025,7 @@ function updateConferenceStats(results) {
             </div>
         </div>
     `;
-    
+
     const overviewSection = document.getElementById('overview-section');
     if (overviewSection) {
         const existingStats = overviewSection.querySelector('.stats-container');
@@ -860,7 +1040,7 @@ function updateConferenceStats(results) {
 function updateTopicsSection(results) {
     const topicsContainer = document.getElementById('topicGraph');
     if (!topicsContainer) return;
-    
+
     topicsContainer.innerHTML = `
         <div class="topic-analysis-container">
             <div class="topic-relationships">
@@ -896,7 +1076,7 @@ function updateTopicsSection(results) {
             </div>
         </div>
     `;
-    
+
     // Create topic distribution chart
     const ctx = document.getElementById('topicDistributionChart').getContext('2d');
     new Chart(ctx, {
@@ -929,7 +1109,7 @@ function updateSpeakersSection(results) {
     const speakersList = document.getElementById('speakersList');
     const speakerRolesChart = document.getElementById('speakerRolesChart');
     const sessionTypesChart = document.getElementById('sessionTypesChart');
-    
+
     if (!speakersList || !speakerRolesChart || !sessionTypesChart) {
         console.error('Required elements not found');
         return;
@@ -997,13 +1177,13 @@ function updateSpeakersSection(results) {
                                             <div class="speaker-topics">
                                                 <strong>Expertise:</strong>
                                                 <div class="tags-container">
-                                                    ${speaker.topics.map(topic => 
+                                                    ${speaker.topics.map(topic =>
                                                         `<span class="tag">${topic}</span>`
                                                     ).join('')}
                                                 </div>
                                             </div>
                                         ` : ''}
-                                        <button class="btn btn-sm btn-primary mt-2 btn-research" 
+                                        <button class="btn btn-sm btn-primary mt-2 btn-research"
                                                 onclick="event.stopPropagation(); lookupSpeaker('${speaker.name}')">
                                             Research Speaker
                                         </button>
@@ -1105,7 +1285,7 @@ function updateSpeakersSection(results) {
 function toggleSpeakerDetails(element) {
     const details = element.querySelector('.speaker-details');
     const wasHidden = details.style.display === 'none';
-    
+
     // Hide all other expanded items
     document.querySelectorAll('.speaker-details').forEach(detail => {
         detail.style.display = 'none';
@@ -1113,7 +1293,7 @@ function toggleSpeakerDetails(element) {
     document.querySelectorAll('.speaker-item').forEach(item => {
         item.classList.remove('expanded');
     });
-    
+
     // Show/hide clicked item
     if (wasHidden) {
         details.style.display = 'block';
@@ -1125,7 +1305,7 @@ function updateMSLSection(results) {
     const mslPrep = document.getElementById('mslPreparation');
     const kolList = document.getElementById('kolList');
     const prioritySessions = document.getElementById('prioritySessions');
-    
+
     // Generate MSL preparation recommendations
     generateMSLPreparation(pdfText, results.speakers).then(recommendations => {
         if (mslPrep) {
@@ -1136,17 +1316,17 @@ function updateMSLSection(results) {
             `;
         }
     });
-    
+
     if (!results.speakers || !Array.isArray(results.speakers)) {
         kolList.innerHTML = '<div class="alert alert-info">No speakers found to analyze</div>';
         return;
     }
-    
+
     // Sort speakers by relevance
-    const sortedSpeakers = [...results.speakers].sort((a, b) => 
+    const sortedSpeakers = [...results.speakers].sort((a, b) =>
         (b.topics?.length || 0) - (a.topics?.length || 0)
     );
-    
+
     // Update KOL List
     kolList.innerHTML = sortedSpeakers.slice(0, 5).map(speaker => `
         <div class="prep-item">
@@ -1155,13 +1335,13 @@ function updateMSLSection(results) {
             <small class="text-muted">Expert in: ${speaker.topics?.join(', ') || 'Topics not specified'}</small>
         </div>
     `).join('');
-    
+
     // Update Priority Sessions
     if (!results.topics || !Array.isArray(results.topics)) {
         prioritySessions.innerHTML = '<div class="alert alert-info">No topics found to analyze</div>';
         return;
     }
-    
+
     const sortedTopics = [...results.topics].sort((a, b) => (b.weight || 0) - (a.weight || 0));
     prioritySessions.innerHTML = sortedTopics.slice(0, 5).map(topic => `
         <div class="prep-item">
@@ -1301,7 +1481,7 @@ async function researchSpeakerWithWebSearch(speaker) {
                 messages: [
                     {
                         role: "user",
-                        content: `Research ${speaker.name} who is ${speaker.role || 'a speaker'} at ${speaker.affiliation || 'their organization'}. 
+                        content: `Research ${speaker.name} who is ${speaker.role || 'a speaker'} at ${speaker.affiliation || 'their organization'}.
 Topics of interest: ${speaker.topics ? speaker.topics.join(', ') : 'Not specified'}`
                     }
                 ],
@@ -1436,7 +1616,7 @@ function initializeResearchBot() {
                 handleUserMessage();
             }
         });
-        
+
         sendButton.addEventListener('click', handleUserMessage);
     }
 }
@@ -1446,7 +1626,7 @@ function initializeVeniceApiChat() {
     const veniceInput = document.getElementById('veniceApiInput');
     const veniceSendBtn = document.getElementById('veniceApiSend');
     const veniceModelSelect = document.getElementById('veniceApiModel');
-    
+
     // Check model availability for Venice API Chat
     checkModelAvailability().then(availableModels => {
         if (availableModels.length === 0) {
@@ -1456,7 +1636,7 @@ function initializeVeniceApiChat() {
             });
         }
     });
-    
+
     if (veniceInput && veniceSendBtn) {
         veniceInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter' && !e.shiftKey) {
@@ -1464,7 +1644,7 @@ function initializeVeniceApiChat() {
                 handleVeniceApiMessage();
             }
         });
-        
+
         veniceSendBtn.addEventListener('click', handleVeniceApiMessage);
     }
 }
@@ -1472,29 +1652,29 @@ function initializeVeniceApiChat() {
 async function handleVeniceApiMessage() {
     const veniceInput = document.getElementById('veniceApiInput');
     const message = veniceInput.value.trim();
-    
+
     if (!message) return;
-    
+
     // Add user message to Venice chat
     addVeniceMessage({
         type: 'user',
         content: message
     });
-    
+
     // Clear input
     veniceInput.value = '';
-    
+
     // Add loading message
     const loadingId = addVeniceMessage({
         type: 'loading',
         content: 'Processing...'
     });
-    
+
     try {
         // Get selected model
         const modelSelect = document.getElementById('veniceApiModel');
         const selectedModel = modelSelect.value;
-        
+
         // Call Venice API
         const response = await fetch(`${API_URL}/chat/completions`, {
             method: 'POST',
@@ -1521,23 +1701,23 @@ async function handleVeniceApiMessage() {
                 }]
             })
         });
-        
+
         if (!response.ok) {
             throw new Error(`API request failed with status ${response.status}`);
         }
-        
+
         const data = await response.json();
-        
+
         // Remove loading message
         removeVeniceMessage(loadingId);
-        
+
         // Add bot response
         addVeniceMessage({
             type: 'bot',
             content: data.choices[0].message.content,
             sources: data.tool_results?.web_search || []
         });
-        
+
     } catch (error) {
         console.error('Error in Venice API chat:', error);
         removeVeniceMessage(loadingId);
@@ -1551,11 +1731,11 @@ async function handleVeniceApiMessage() {
 function addVeniceMessage({ type, content, sources = null }) {
     const chatMessages = document.getElementById('veniceApiMessages');
     const messageId = Date.now();
-    
+
     const messageElement = document.createElement('div');
     messageElement.className = `message ${type}`;
     messageElement.id = `venice-message-${messageId}`;
-    
+
     if (type === 'loading') {
         messageElement.innerHTML = `
             <div class="spinner-border spinner-border-sm text-primary" role="status">
@@ -1565,7 +1745,7 @@ function addVeniceMessage({ type, content, sources = null }) {
         `;
     } else {
         let messageContent = content;
-        
+
         // Add sources if available
         if (sources && sources.length > 0) {
             messageContent += `
@@ -1579,19 +1759,19 @@ function addVeniceMessage({ type, content, sources = null }) {
                 </div>
             `;
         }
-        
+
         messageElement.innerHTML = messageContent;
-        
+
         // Add timestamp
         const timestamp = document.createElement('div');
         timestamp.className = 'timestamp';
         timestamp.textContent = new Date().toLocaleTimeString();
         messageElement.appendChild(timestamp);
     }
-    
+
     chatMessages.appendChild(messageElement);
     chatMessages.scrollTop = chatMessages.scrollHeight;
-    
+
     return messageId;
 }
 
@@ -1607,15 +1787,15 @@ async function checkModelAvailability() {
     try {
         // Fetch available models from the API
         const apiModels = await fetchAvailableModels();
-        
+
         // Create a combined list of models
         const allModels = [...DEFAULT_MODELS];
-        
+
         // Update availability status of default models
         allModels.forEach(model => {
             model.isAvailable = apiModels.some(apiModel => apiModel.id === model.id);
         });
-        
+
         // Add any additional models from the API
         apiModels.forEach(apiModel => {
             if (!allModels.some(m => m.id === apiModel.id)) {
@@ -1642,16 +1822,16 @@ function updateModelSelects(models) {
     const modelSelects = ['researchModel', 'veniceApiModel']
         .map(id => document.getElementById(id))
         .filter(Boolean);
-    
+
     modelSelects.forEach(select => {
         if (!select) return;
-        
+
         // Clear existing options
         select.innerHTML = '';
-        
+
         // Add only available models
         const availableModels = models.filter(model => model.isAvailable);
-        
+
         availableModels.forEach(model => {
             const option = document.createElement('option');
             option.value = model.id;
@@ -1659,7 +1839,7 @@ function updateModelSelects(models) {
             option.selected = model.id === 'mixtral-8x7b';
             select.appendChild(option);
         });
-        
+
         // If no models are available, add a default option
         if (select.options.length === 0) {
             const option = document.createElement('option');
@@ -1673,13 +1853,13 @@ function updateModelSelects(models) {
 function addMessage({ type, content, sources }) {
     const chatMessages = document.getElementById('chatMessages');
     if (!chatMessages) return;
-    
+
     const messageId = Date.now();
-    
+
     const messageElement = document.createElement('div');
     messageElement.className = `message ${type}`;
     messageElement.id = `message-${messageId}`;
-    
+
     if (type === 'loading') {
         messageElement.innerHTML = `
             <div class="spinner-border spinner-border-sm" role="status">
@@ -1700,12 +1880,12 @@ function addMessage({ type, content, sources }) {
             .replace(/- (.*?)(?=\n|$)/g, '<li>$1</li>')
             .replace(/<li>(.*?)<\/li>(?:\s*<li>)/g, '<ul><li>$1</li><li>')
             .replace(/<\/li>\s*(?!<li>)/g, '</li></ul>');
-        
+
         // Wrap in paragraph tags if not already wrapped
         if (!formattedContent.startsWith('<p>')) {
             formattedContent = `<p>${formattedContent}</p>`;
         }
-        
+
         // Add sources if available
         if (sources && sources.length > 0) {
             formattedContent += `
@@ -1723,26 +1903,26 @@ function addMessage({ type, content, sources }) {
                 </div>
             `;
         }
-        
+
         messageElement.innerHTML = formattedContent;
     } else {
         messageElement.innerHTML = content;
     }
-    
+
     // Add timestamp
     const timestamp = document.createElement('div');
     timestamp.className = 'timestamp';
     timestamp.textContent = new Date().toLocaleTimeString();
     messageElement.appendChild(timestamp);
-    
+
     // Store in chat history
     if (type !== 'system') {
         chatHistory.push({ type, content });
     }
-    
+
     chatMessages.appendChild(messageElement);
     chatMessages.scrollTop = chatMessages.scrollHeight;
-    
+
     return messageId;
 }
 
@@ -1757,31 +1937,31 @@ function removeMessage(messageId) {
 async function handleUserMessage() {
     const chatInput = document.getElementById('chatInput');
     const message = chatInput.value.trim();
-    
+
     if (!message) return;
-    
+
     // Add user message to chat
     addMessage({
         type: 'user',
         content: message
     });
-    
+
     // Clear input
     chatInput.value = '';
-    
+
     // Add loading message
     const loadingId = addMessage({
         type: 'loading',
         content: 'Researching...'
     });
-    
+
     try {
         // Get selected model
         const modelSelect = document.getElementById('researchModel');
         const selectedModel = modelSelect.value || 'mixtral-8x7b';
-        
+
         console.log(`Making API request with model: ${selectedModel}`);
-        
+
         // Call Venice API
         const response = await fetch(`${API_URL}/chat/completions`, {
             method: 'POST',
@@ -1794,7 +1974,7 @@ async function handleUserMessage() {
                 messages: [
                     {
                         role: "system",
-                        content: `You are a research assistant specializing in analyzing conference content. 
+                        content: `You are a research assistant specializing in analyzing conference content.
                         Provide detailed, accurate responses about conference topics, speakers, and sessions.
                         Format your responses with clear structure:
                         - Use paragraphs to separate ideas
@@ -1814,24 +1994,24 @@ async function handleUserMessage() {
                 }
             })
         });
-        
+
         if (!response.ok) {
             const errorData = await response.json().catch(() => ({}));
             throw new Error(`API request failed with status ${response.status}: ${errorData.error || 'Unknown error'}`);
         }
-        
+
         const data = await response.json();
-        
+
         // Remove loading message
         removeMessage(loadingId);
-        
+
         // Add bot response
         addMessage({
             type: 'bot',
             content: data.choices[0].message.content,
             sources: data.venice_parameters?.web_search_citations || []
         });
-        
+
     } catch (error) {
         console.error('Error in research:', error);
         removeMessage(loadingId);
@@ -1871,7 +2051,7 @@ function setupDragAndDrop(dropZone, fileInput, selectedFileName) {
 
     // Handle dropped files
     dropZone.addEventListener('drop', handleDrop, false);
-    
+
     // Handle file input change
     fileInput.addEventListener('change', handleFileInputChange, false);
 
@@ -1953,23 +2133,23 @@ async function loadExampleAgenda(filename) {
         if (!response.ok) {
             throw new Error(`Failed to load example agenda: ${response.statusText}`);
         }
-        
+
         // Convert the response to a blob
         const blob = await response.blob();
-        
+
         // Create a File object from the blob
         const file = new File([blob], filename, { type: 'application/pdf' });
-        
+
         // Update the file input and selected file name display
         const fileInput = document.getElementById('pdfFile');
         const dataTransfer = new DataTransfer();
         dataTransfer.items.add(file);
         fileInput.files = dataTransfer.files;
-        
+
         // Update the UI to show the selected file
         const selectedFileName = document.getElementById('selectedFileName');
         const dropZone = document.getElementById('dropZone');
-        
+
         selectedFileName.innerHTML = `
             <div class="selected-file">
                 <i class="bi bi-file-pdf me-2"></i>
@@ -1979,7 +2159,7 @@ async function loadExampleAgenda(filename) {
         selectedFileName.style.color = 'var(--success-color)';
         dropZone.classList.remove('border-danger');
         dropZone.classList.add('border-success');
-        
+
         // Add success message
         const uploadStatus = document.querySelector('.upload-status');
         if (uploadStatus) {
@@ -1990,10 +2170,10 @@ async function loadExampleAgenda(filename) {
                 </div>
             `;
         }
-        
+
         // Automatically submit the form to start analysis
         document.getElementById('uploadForm').dispatchEvent(new Event('submit'));
-        
+
     } catch (error) {
         console.error('Error loading example agenda:', error);
         const uploadStatus = document.querySelector('.upload-status');
@@ -2095,7 +2275,7 @@ function initializeDeepInsightsCharts() {
                         label: 'Number of Abstracts',
                         data: [25, 22, 18, 15, 12, 8, 6],
                         backgroundColor: [
-                            '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', 
+                            '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0',
                             '#9966FF', '#FF9F40', '#C9CBCF'
                         ]
                     }]
@@ -2142,7 +2322,7 @@ function initializeCompetitiveIntelCharts() {
                         label: 'Number of Abstracts',
                         data: [24, 22, 19, 17, 14, 10, 8, 15],
                         backgroundColor: [
-                            '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', 
+                            '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0',
                             '#9966FF', '#FF9F40', '#C9CBCF', '#8A8A8A'
                         ]
                     }]
@@ -2296,7 +2476,7 @@ function initializeCompetitiveIntelCharts() {
                     datasets: [{
                         data: [25, 20, 15, 13, 10, 17],
                         backgroundColor: [
-                            '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', 
+                            '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0',
                             '#9966FF', '#C9CBCF'
                         ],
                         borderWidth: 0
@@ -2331,7 +2511,7 @@ function initializePostCongressCharts() {
                         label: 'Previously Unreleased Data Points',
                         data: [38, 35, 32, 28, 25, 20, 18],
                         backgroundColor: [
-                            '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', 
+                            '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0',
                             '#9966FF', '#FF9F40', '#C9CBCF'
                         ]
                     }]
@@ -2369,9 +2549,9 @@ function initializePostCongressCharts() {
                 type: 'bar',
                 data: {
                     labels: [
-                        'Treatment Approaches', 
-                        'Biomarkers', 
-                        'Adverse Events', 
+                        'Treatment Approaches',
+                        'Biomarkers',
+                        'Adverse Events',
                         'Pipeline Interest',
                         'Competitive Data',
                         'Patient Management'
@@ -2421,7 +2601,7 @@ function initializeNavigation() {
             document.getElementById(section).classList.add('active');
             document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
             this.classList.add('active');
-            
+
             // Initialize charts when navigating to their respective sections
             if (section === 'deep-insights-section') {
                 initializeDeepInsightsCharts();
@@ -2443,11 +2623,11 @@ function initializeAIFeaturesSection() {
             showTab(targetId);
         });
     });
-    
+
     // Show default tab
     document.getElementById('medical-affairs-tab').classList.add('active');
     document.getElementById('medical-affairs-content').style.display = 'block';
-    
+
     // Initialize the phase content
     initializeTabPhaseContent();
 }
@@ -2457,12 +2637,12 @@ function showTab(tabId) {
     document.querySelectorAll('.tab-content').forEach(div => {
         div.style.display = 'none';
     });
-    
+
     // Remove active class from all tab links
     document.querySelectorAll('.ai-features-nav-item').forEach(link => {
         link.classList.remove('active');
     });
-    
+
     // Show the specific content div and add active class to the clicked tab link
     document.getElementById(tabId + '-content').style.display = 'block';
     document.getElementById(tabId + '-tab').classList.add('active');
@@ -2474,23 +2654,23 @@ function initializeTabPhaseContent() {
         button.addEventListener('click', function() {
             // Get the selected phase (pre, on, post)
             const phase = this.getAttribute('data-phase');
-            
+
             // Get the parent tab content container
             const tabContent = this.closest('.tab-content');
-            
+
             // Remove active class from all buttons in this tab
             tabContent.querySelectorAll('.phase-selector .btn').forEach(btn => {
                 btn.classList.remove('active');
             });
-            
+
             // Add active class to clicked button
             this.classList.add('active');
-            
+
             // Hide all phase contents in this tab
             tabContent.querySelectorAll('.phase-content').forEach(content => {
                 content.style.display = 'none';
             });
-            
+
             // Show the selected phase content
             const phaseContent = tabContent.querySelector(`.phase-content[data-phase="${phase}"]`);
             if (phaseContent) {
@@ -2498,7 +2678,7 @@ function initializeTabPhaseContent() {
             }
         });
     });
-    
+
     // Activate pre-congress phase by default for all tabs
     document.querySelectorAll('.tab-content').forEach(tabContent => {
         // Find the pre-congress button in this tab
@@ -2506,7 +2686,7 @@ function initializeTabPhaseContent() {
         if (preCongressButton) {
             // Simulate a click on the pre-congress button
             preCongressButton.classList.add('active');
-            
+
             // Show the pre-congress phase content
             const preCongressContent = tabContent.querySelector('.phase-content[data-phase="pre"]');
             if (preCongressContent) {
@@ -2520,23 +2700,412 @@ function initializeTabPhaseContent() {
 document.addEventListener('DOMContentLoaded', function() {
     // Initialize the navigation
     initializeNavigation();
-    
+
     // Check API key and model availability
     checkApiKeyAndInitialize();
-    
+
     // Initialize Research Bot
     initializeResearchBot();
-    
+
     // Initialize Venice API Chat
     initializeVeniceApiChat();
-    
+
     // Initialize mockup charts for the new sections immediately
     setTimeout(() => {
         initializeDeepInsightsCharts();
         initializeCompetitiveIntelCharts();
         initializePostCongressCharts();
     }, 500);
-    
+
     // Initialize AI Features section
     initializeAIFeaturesSection();
 });
+
+// Helper functions for handleFileUpload
+async function fileToBase64(file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = error => reject(error);
+    });
+}
+
+async function analyzeWebsiteContent(url, model) {
+    // Construct a prompt to extract agenda info from the URL using Venice's web search/scraping capability
+    const prompt = `Analyze the conference agenda found at this URL: ${url}.
+    Extract the following information and format it exactly as shown:
+
+### Key Highlights
+- [Brief, impactful statements about the most important aspects]
+
+### Topics
+- Topic: [topic name]
+- Weight: [number 1-10]
+- Description: [brief description]
+- Related: [comma-separated list of related topics]
+
+### Therapeutic Areas
+- Name: [therapeutic area name]
+- Description: [description]
+- Key Sessions: [relevant sessions]
+- Featured Speakers: [key speakers]
+
+### Key Themes
+- Theme: [theme name]
+- Description: [description]
+- Related Sessions: [relevant session names]
+
+### Speakers
+- Name: [name]
+- Role: [role]
+- Affiliation: [organization]
+- Topics: [topics]
+`;
+
+    const response = await fetch(`${API_URL}/chat/completions`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${VENICE_API_KEY}`
+        },
+        body: JSON.stringify({
+            model: model,
+            messages: [{ role: "user", content: prompt }],
+            venice_parameters: {
+                enable_web_search: "auto",
+                enable_web_scraping: true
+            }
+        })
+    });
+
+    if (!response.ok) throw new Error('Website analysis failed');
+    const data = await response.json();
+    return parseAnalysisResponse(data.choices[0].message.content);
+}
+
+async function analyzeScreenshotContent(base64Image, model) {
+    // Ensure we use a vision capable model
+    const visionModel = 'qwen-2.5-vl'; // Force vision model or check capabilities
+
+    const response = await fetch(`${API_URL}/chat/completions`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${VENICE_API_KEY}`
+        },
+        body: JSON.stringify({
+            model: visionModel,
+            messages: [
+                {
+                    role: "user",
+                    content: [
+                        { type: "text", text: "Analyze this conference agenda image. Extract Key Highlights, Topics (with weight 1-10), Therapeutic Areas, Key Themes, and Speakers. Format with Markdown headers like ### Topics, ### Speakers, etc." },
+                        { type: "image_url", image_url: { url: base64Image } }
+                    ]
+                }
+            ]
+        })
+    });
+
+    if (!response.ok) throw new Error('Screenshot analysis failed');
+    const data = await response.json();
+    return parseAnalysisResponse(data.choices[0].message.content);
+}
+
+function parseAnalysisResponse(content) {
+    // Reuse the parsing logic from analyzePDFContent but separate it out
+    const sections = content.split('###').filter(Boolean);
+    const result = {
+        highlights: [],
+        topics: [],
+        speakers: [],
+        therapeuticAreas: [],
+        themes: []
+    };
+
+    sections.forEach(section => {
+        const [title, ...lines] = section.trim().split('\n');
+        const cleanLines = lines.filter(line => line.trim() && line.trim().startsWith('-'));
+
+        switch (title.trim()) {
+            case 'Key Highlights':
+                result.highlights = cleanLines.map(line => line.replace('- ', '').trim());
+                break;
+            case 'Topics':
+                let currentTopic = {};
+                cleanLines.forEach(line => {
+                    const [key, value] = line.replace('- ', '').split(': ');
+                    if (key === 'Topic') {
+                        if (Object.keys(currentTopic).length > 0) result.topics.push({...currentTopic});
+                        currentTopic = {};
+                    }
+                    if (key) currentTopic[key.toLowerCase()] = value;
+                });
+                if (Object.keys(currentTopic).length > 0) result.topics.push(currentTopic);
+                break;
+            case 'Speakers': // Handle Speakers explicitly if present in main analysis
+                 let currentSpeaker = {};
+                 cleanLines.forEach(line => {
+                    const [key, value] = line.replace('- ', '').split(': ');
+                    if (key === 'Name') {
+                        if (Object.keys(currentSpeaker).length > 0) result.speakers.push({...currentSpeaker});
+                        currentSpeaker = {};
+                    }
+                    if (key) currentSpeaker[key.toLowerCase()] = value;
+                 });
+                 if (Object.keys(currentSpeaker).length > 0) result.speakers.push(currentSpeaker);
+                 break;
+            // ... (Add other cases or reuse existing logic if refactored)
+            case 'Therapeutic Areas':
+                let currentArea = {};
+                cleanLines.forEach(line => {
+                    const [key, value] = line.replace('- ', '').split(': ');
+                    if (key === 'Name') {
+                        if (Object.keys(currentArea).length > 0) result.therapeuticAreas.push({...currentArea});
+                        currentArea = {};
+                    }
+                    if (key === 'Featured Speakers' || key === 'Key Sessions') {
+                        currentArea[key.toLowerCase()] = value.split(',').map(item => item.trim());
+                    } else {
+                        currentArea[key.toLowerCase()] = value;
+                    }
+                });
+                if (Object.keys(currentArea).length > 0) result.therapeuticAreas.push(currentArea);
+                break;
+            case 'Key Themes':
+                cleanLines.forEach(line => {
+                    const [key, value] = line.replace('- ', '').split(': ');
+                    if (key === 'Theme') {
+                        result.themes.push({ name: value, description: '', relatedSessions: [] });
+                    } else if (key === 'Description' && result.themes.length > 0) {
+                        result.themes[result.themes.length - 1].description = value;
+                    } else if (key === 'Related Sessions' && result.themes.length > 0) {
+                        result.themes[result.themes.length - 1].relatedSessions = value.split(',').map(s => s.trim());
+                    }
+                });
+                break;
+        }
+    });
+    return result;
+}
+
+async function generateSummaryFromResults(results, model) {
+    // Generate a summary text from the structured results if raw text isn't available
+    const summaryPrompt = `Generate a conference summary based on these highlights: ${JSON.stringify(results.highlights)} and themes: ${JSON.stringify(results.themes)}`;
+
+    const response = await fetch(`${API_URL}/chat/completions`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${VENICE_API_KEY}`
+        },
+        body: JSON.stringify({
+            model: model,
+            messages: [{ role: "user", content: summaryPrompt }]
+        })
+    });
+
+    const data = await response.json();
+    return data.choices[0].message.content;
+}
+
+// Redefined handleFileUpload to support tabs
+async function handleFileUpload(event) {
+    event.preventDefault();
+
+    // Determine active tab
+    const activeTab = document.querySelector('.nav-link.active[data-bs-toggle="tab"]');
+    const activeTabId = activeTab ? activeTab.id : 'pdf-tab';
+
+    const uploadStatus = document.querySelector('.upload-status');
+    const progressContainer = document.getElementById('uploadProgress');
+    const modelSelect = document.getElementById('modelSelect');
+    const selectedModel = modelSelect?.value || 'mixtral-8x7b';
+
+    // Initialize progress tracking
+    if (progressContainer) {
+        progressContainer.innerHTML = `
+            <div class="progress-container">
+                <div class="progress-circle-container">
+                    <div class="progress-circle">
+                        <svg class="progress-ring" width="120" height="120">
+                            <circle class="progress-ring__circle" stroke="currentColor" stroke-width="4" fill="transparent" r="52" cx="60" cy="60"/>
+                        </svg>
+                        <div class="progress-text">0%</div>
+                    </div>
+                    <div class="progress-status">Starting...</div>
+                </div>
+                <div class="current-file mt-3">
+                    <i class="bi bi-gear-wide-connected me-2"></i>
+                    Processing Request
+                </div>
+            </div>
+        `;
+        progressContainer.style.display = 'block';
+        progressContainer.classList.remove('d-none');
+    }
+
+    const circle = progressContainer?.querySelector('.progress-ring__circle');
+    const radius = circle ? circle.r.baseVal.value : 52;
+    const circumference = radius * 2 * Math.PI;
+
+    if (circle) {
+        circle.style.strokeDasharray = `${circumference} ${circumference}`;
+        circle.style.strokeDashoffset = circumference;
+    }
+
+    function setProgress(percent, status) {
+        if (!progressContainer) return;
+        const offset = circumference - (percent / 100 * circumference);
+        if (circle) circle.style.strokeDashoffset = offset;
+        progressContainer.querySelector('.progress-text').textContent = `${Math.round(percent)}%`;
+        progressContainer.querySelector('.progress-status').textContent = status;
+    }
+
+    try {
+        let extractedText = '';
+        let analysisResults = null;
+        let summary = '';
+
+        if (activeTabId === 'website-tab') {
+            const urlInput = document.getElementById('websiteUrl');
+            const url = urlInput.value.trim();
+            if (!url) throw new Error('Please enter a valid URL');
+
+            setProgress(30, 'Analyzing website...');
+            // For website, we ask Venice to research the URL
+            analysisResults = await analyzeWebsiteContent(url, selectedModel);
+            extractedText = `Website Analysis of ${url}`; // Placeholder
+
+        } else if (activeTabId === 'screenshot-tab') {
+            const fileInput = document.getElementById('screenshotFile');
+            const file = fileInput.files[0];
+            if (!file) throw new Error('Please select an image file');
+
+            setProgress(30, 'Analyzing screenshot...');
+            const base64Image = await fileToBase64(file);
+            analysisResults = await analyzeScreenshotContent(base64Image, selectedModel);
+            extractedText = "Screenshot Analysis"; // Placeholder
+
+        } else {
+            // PDF Handling
+            const fileInput = document.getElementById('pdfFile');
+            const file = fileInput.files[0];
+            if (!file) throw new Error('Please select a PDF file');
+
+            setProgress(25, 'Extracting text...');
+            extractedText = await extractTextFromPDF(file);
+
+            if (!extractedText || extractedText.trim().length === 0) {
+                throw new Error('No text extracted from PDF. It might be image-based.');
+            }
+
+            setProgress(50, 'Analyzing content...');
+            analysisResults = await analyzePDFContent(extractedText, selectedModel);
+        }
+
+        // Store global text for other functions
+        pdfText = extractedText;
+
+        setProgress(75, 'Generating summary...');
+        if (!summary && activeTabId === 'pdf-tab') {
+             summary = await generateAgendaSummary(extractedText, selectedModel);
+        } else {
+             // For website/screenshot, the analysis might already include summary or we generate one from results
+             summary = await generateSummaryFromResults(analysisResults, selectedModel);
+        }
+
+        setProgress(100, 'Complete!');
+        processResults(analysisResults, summary);
+
+        // Switch to summary section
+        document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+        document.querySelector('[data-section="summary-section"]').classList.add('active');
+        document.querySelectorAll('.content-section').forEach(section => {
+            section.style.display = 'none';
+        });
+        document.getElementById('summary-section').style.display = 'block';
+
+        setTimeout(() => {
+            if (progressContainer) progressContainer.classList.add('d-none');
+        }, 1000);
+
+    } catch (error) {
+        console.error('Error:', error);
+        const errorDiv = document.createElement('div');
+        errorDiv.className = 'alert alert-danger mt-3';
+        errorDiv.innerHTML = `<strong>Error:</strong> ${error.message}`;
+        document.querySelector('#uploadForm').appendChild(errorDiv);
+
+        if (progressContainer) {
+            setProgress(100, 'Error!');
+            if (circle) circle.style.stroke = 'var(--danger-color)';
+            setTimeout(() => progressContainer.classList.add('d-none'), 2000);
+        }
+    }
+}
+
+// Add function for Medical Affairs Congress Plan
+async function generateCongressPlan() {
+    const contentDiv = document.getElementById('congressPlanContent');
+    const model = document.getElementById('modelSelect')?.value || 'llama-3.3-70b';
+
+    // Check if we have data to work with
+    if (!extractedTopics.length && !extractedSpeakers.length && !pdfText) {
+        contentDiv.innerHTML = '<div class="alert alert-warning">Please analyze an agenda first.</div>';
+        return;
+    }
+
+    contentDiv.innerHTML = '<div class="text-center"><div class="spinner-border text-primary" role="status"></div><p class="mt-2">Generating Medical Affairs Congress Plan...</p></div>';
+
+    try {
+        const prompt = `Based on the conference agenda information below, create a comprehensive Medical Affairs Congress Plan.
+
+        Information:
+        - Key Topics: ${JSON.stringify(extractedTopics.slice(0, 10))}
+        - Key Speakers: ${JSON.stringify(extractedSpeakers.slice(0, 10))}
+        - Therapeutic Areas: ${JSON.stringify(therapeuticAreas)}
+
+        Please generate a plan with the following sections in HTML format:
+        1. **Executive Summary**: High-level overview of the congress value for Medical Affairs.
+        2. **Key Scientific Themes**: The major scientific pillars to focus on.
+        3. **KOL Engagement Plan**: Prioritized list of KOLs to engage and suggested topics.
+        4. **Competitive Intelligence Objectives**: What to look for regarding competitors.
+        5. **Session Prioritization**: "Must-attend" sessions for the Medical team.
+        6. **Post-Congress Action Items**: Immediate steps to take after the event.
+
+        Format as clear HTML with <h3> headers and lists.`;
+
+        const response = await fetch(`${API_URL}/chat/completions`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${VENICE_API_KEY}`
+            },
+            body: JSON.stringify({
+                model: model,
+                messages: [{ role: "user", content: prompt }]
+            })
+        });
+
+        if (!response.ok) throw new Error('Failed to generate plan');
+
+        const data = await response.json();
+        let planHtml = data.choices[0].message.content;
+
+        // Basic Markdown to HTML conversion if needed (Venice often returns Markdown)
+        planHtml = planHtml
+            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+            .replace(/### (.*?)\n/g, '<h3>$1</h3>')
+            .replace(/\n- (.*?)/g, '<li>$1</li>')
+            .replace(/<\/li>\n<li>/g, '</li><li>')
+            .replace(/\n\n/g, '<br><br>');
+
+        contentDiv.innerHTML = planHtml;
+
+    } catch (error) {
+        console.error("Error generating plan:", error);
+        contentDiv.innerHTML = `<div class="alert alert-danger">Error generating plan: ${error.message}</div>`;
+    }
+}

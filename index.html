@@ -67,6 +67,10 @@
                     <i class="bi bi-journal-check"></i>
                     <span>Post-Congress</span>
                 </button>
+                <button class="nav-item" data-section="congress-plan-section">
+                    <i class="bi bi-journal-medical"></i>
+                    <span>Medical Plan</span>
+                </button>
                 <button class="nav-item" data-section="ai-features-section">
                     <i class="bi bi-cpu"></i>
                     <span>AI Features</span>
@@ -141,8 +145,29 @@
                             </div>
                         </div>
                         
+                        <!-- Source Selection Tabs -->
+                        <ul class="nav nav-tabs mb-4" id="sourceTabs" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link active" id="pdf-tab" data-bs-toggle="tab" data-bs-target="#pdf-content" type="button" role="tab" aria-selected="true">
+                                    <i class="bi bi-file-pdf me-2"></i>PDF Upload
+                                </button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="website-tab" data-bs-toggle="tab" data-bs-target="#website-content" type="button" role="tab" aria-selected="false">
+                                    <i class="bi bi-globe me-2"></i>Website
+                                </button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="screenshot-tab" data-bs-toggle="tab" data-bs-target="#screenshot-content" type="button" role="tab" aria-selected="false">
+                                    <i class="bi bi-image me-2"></i>Screenshots
+                                </button>
+                            </li>
+                        </ul>
+
                         <form id="uploadForm" class="mb-4">
-                            <div class="upload-area" id="dropZone">
+                            <div class="tab-content" id="sourceTabContent">
+                                <div class="tab-pane fade show active" id="pdf-content" role="tabpanel" aria-labelledby="pdf-tab">
+                                    <div class="upload-area" id="dropZone">
                                 <input type="file" id="pdfFile" accept="application/pdf" class="d-none">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="currentColor" class="bi bi-cloud-upload mb-3" viewBox="0 0 16 16">
                                     <path fill-rule="evenodd" d="M4.406 1.342A5.53 5.53 0 0 1 8 0c2.69 0 4.923 2 5.166 4.579C14.758 4.804 16 6.137 16 7.773 16 9.569 14.502 11 12.687 11H10a.5.5 0 0 1 0-1h2.688C13.979 10 15 8.988 15 7.773c0-1.216-1.02-2.228-2.313-2.228h-.5v-.5C12.188 2.825 10.328 1 8 1a4.53 4.53 0 0 0-2.941 1.1c-.757.652-1.153 1.438-1.153 2.055v.448l-.445.049C2.064 4.805 1 5.952 1 7.318 1 8.785 2.23 10 3.781 10H6a.5.5 0 0 1 0 1H3.781C1.708 11 0 9.366 0 7.318c0-1.763 1.266-3.223 2.942-3.593.143-.863.698-1.723 1.464-2.383z"/>
@@ -156,6 +181,40 @@
                                 <p id="selectedFileName" class="mt-2 text-muted"></p>
                             </div>
                             
+                                    </div>
+                                </div>
+
+                                <!-- Website Tab -->
+                                <div class="tab-pane fade" id="website-content" role="tabpanel" aria-labelledby="website-tab">
+                                    <div class="card p-4">
+                                        <div class="mb-3">
+                                            <label for="websiteUrl" class="form-label">Conference Website URL</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text"><i class="bi bi-link-45deg"></i></span>
+                                                <input type="url" class="form-control" id="websiteUrl" placeholder="https://www.conference-website.com/agenda">
+                                            </div>
+                                            <div class="form-text text-muted">Enter the URL of the conference agenda or program page. We'll scrape it for analysis.</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Screenshot Tab -->
+                                <div class="tab-pane fade" id="screenshot-content" role="tabpanel" aria-labelledby="screenshot-tab">
+                                    <div class="card p-4">
+                                        <div class="upload-area" id="screenshotDropZone">
+                                            <input type="file" id="screenshotFile" accept="image/*" class="d-none">
+                                            <i class="bi bi-image" style="font-size: 48px;"></i>
+                                            <h4>Upload Screenshot</h4>
+                                            <p class="text-muted">Upload an image of the agenda</p>
+                                            <button type="button" class="btn btn-primary" onclick="document.getElementById('screenshotFile').click()">
+                                                Choose Image
+                                            </button>
+                                            <p id="selectedScreenshotName" class="mt-2 text-muted"></p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
                             <div class="mt-4">
                                 <label for="modelSelect" class="form-label">Select AI Model</label>
                                 <select class="form-select" id="modelSelect" required>
@@ -961,6 +1020,27 @@
                     </div>
                 </div>
                 
+                <!-- Medical Affairs Congress Plan Section -->
+                <section id="congress-plan-section" class="content-section">
+                    <div class="section-header">
+                        <h2>Medical Affairs Congress Plan</h2>
+                        <p>Strategic plan generated from conference data.</p>
+                        <button class="btn btn-primary" onclick="generateCongressPlan()">
+                            <i class="bi bi-magic"></i> Generate Plan
+                        </button>
+                    </div>
+                    <div class="card">
+                        <div class="card-body">
+                            <div id="congressPlanContent" class="msl-content">
+                                <div class="placeholder-text">
+                                    <i class="bi bi-file-earmark-medical" style="font-size: 2rem;"></i><br>
+                                    Upload an agenda or provide a website URL, analyze it, then click "Generate Plan" to create a tailored Congress Plan for Medical Affairs.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
                 <!-- AI Features Section -->
                 <div id="ai-features-section" class="content-section">
                     <div class="section-header">
