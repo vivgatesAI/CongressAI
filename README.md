@@ -34,13 +34,17 @@ npm run dev
 - `POST /api/embeddings` (JSON `{ input }`)
 - `POST /api/tts` (JSON `{ text, voice, speed }`)
 - `POST /api/transcribe` (multipart form with `file`)
+- `POST /api/save`
+- `GET /api/list`
+- `GET /api/get?id=...`
+- `GET /api/export?id=...` (CSV)
+- `GET /api/ical?id=...` (iCal)
 - `GET /api/models`
 - `GET /api/health`
 
-## Suggested Upgrades
-- Vector store for persistent embeddings search
-- Speaker enrichment with citations
-- Session timeline rendering (calendar view)
-- Export JSON → CSV, iCal
-- Save projects + history
-- Multi-doc comparison across congresses
+## Suggested Upgrades (Implemented)
+- Database persistence (Railway Postgres)
+- CSV + iCal export
+- Semantic search (embeddings)
+- Website crawl for agenda + abstracts
+- Chat bot with agenda context

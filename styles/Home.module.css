@@ -128,3 +128,40 @@
   border-radius: 10px;
   padding: 10px;
 }
+
+.savedNotice {
+  margin-top: 8px;
+  color: #16a34a;
+}
+
+.savedList {
+  display: grid;
+  gap: 12px;
+}
+
+.savedCard {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 12px;
+}
+
+.savedMeta {
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.savedActions {
+  margin-top: 8px;
+  display: flex;
+  gap: 8px;
+}
+
+.linkButton {
+  padding: 6px 10px;
+  background: #111827;
+  color: #ffffff;
+  border-radius: 6px;
+  text-decoration: none;
+  font-size: 12px;
+}

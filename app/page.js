@@ -37,6 +37,8 @@ export default function Home() {
   const [sessionEmbeddings, setSessionEmbeddings] = useState(null);
   const [semanticQuery, setSemanticQuery] = useState("");
   const [semanticResults, setSemanticResults] = useState([]);
+  const [savedId, setSavedId] = useState(null);
+  const [savedList, setSavedList] = useState([]);
 
   useEffect(() => {
     fetch("/api/models")
@@ -46,6 +48,11 @@ export default function Home() {
         setModels(textModels);
       })
       .catch(() => setModels([]));
+
+    fetch("/api/list")
+      .then((r) => r.json())
+      .then((data) => setSavedList(data.items || []))
+      .catch(() => setSavedList([]));
   }, []);
 
   const agendaContext = useMemo(() => {
@@ -122,7 +129,8 @@ export default function Home() {
       body: JSON.stringify({ messages: systemAugmented, model: selectedModel }),
     });
     const data = await res.json();
-    setChatMessages([...next, { role: "assistant", content: data.content }]);
+    const assistantContent = data.content || "";
+    setChatMessages([...next, { role: "assistant", content: assistantContent }]);
   }
 
   async function handleTTS() {
@@ -150,6 +158,22 @@ export default function Home() {
     });
     const data = await res.json();
     setSessionEmbeddings(data.data || []);
+  }
+
+  async function handleSave() {
+    if (!agendaJson) return;
+    const res = await fetch("/api/save", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name: agendaJson?.conference?.name, data: agendaJson, source_url: websiteUrl || null }),
+    });
+    const data = await res.json();
+    if (data.id) {
+      setSavedId(data.id);
+      const listRes = await fetch("/api/list");
+      const listData = await listRes.json();
+      setSavedList(listData.items || []);
+    }
   }
 
   function cosineSim(a, b) {
@@ -228,6 +252,12 @@ export default function Home() {
       </div>
 
       <Section title="Structured Agenda JSON">
+        <div className={styles.actions}>
+          <button onClick={handleSave} disabled={!agendaJson}>Save to Database</button>
+        </div>
+        {savedId && (
+          <div className={styles.savedNotice}>Saved: {savedId}</div>
+        )}
         <JsonBlock data={agendaJson} />
       </Section>
 
@@ -250,6 +280,21 @@ export default function Home() {
               <div><strong>Score:</strong> {r.score.toFixed(3)}</div>
               <div><strong>{r.session?.title}</strong></div>
               <div>{r.session?.abstract}</div>
+            </div>
+          ))}
+        </div>
+      </Section>
+
+      <Section title="Saved Congresses">
+        <div className={styles.savedList}>
+          {savedList.map((c) => (
+            <div key={c.id} className={styles.savedCard}>
+              <div><strong>{c.name || c.id}</strong></div>
+              <div className={styles.savedMeta}>{new Date(c.created_at).toLocaleString()}</div>
+              <div className={styles.savedActions}>
+                <a href={`/api/export?id=${c.id}`} className={styles.linkButton}>CSV</a>
+                <a href={`/api/ical?id=${c.id}`} className={styles.linkButton}>iCal</a>
+              </div>
             </div>
           ))}
         </div>
