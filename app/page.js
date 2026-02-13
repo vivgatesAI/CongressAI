@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import styles from "@/styles/Home.module.css";
+import styles from "../styles/Home.module.css";
 
 const DEFAULT_MODEL = "kimi-k2-5";
 

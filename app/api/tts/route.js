@@ -1,4 +1,4 @@
-import { veniceTTS } from "@/lib/venice";
+import { veniceTTS } from "../../../lib/venice.js";
 
 export async function POST(req) {
   try {
